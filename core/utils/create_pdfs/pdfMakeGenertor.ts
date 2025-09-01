@@ -283,7 +283,7 @@ export async function gerarPDFExpedicao(resumo: ExpedicaoResumoPDGrouped[]): Pro
   return new Promise<Buffer>((resolve, reject) => {
     try {
       const chunks: Buffer[] = [];
-      pdfDoc.on('data', chunk => chunks.push(chunk));
+      pdfDoc.on('data', (chunk: any) => chunks.push(chunk));
       pdfDoc.on('end', () => resolve(Buffer.concat(chunks)));
       pdfDoc.on('error', reject);
       pdfDoc.end();
