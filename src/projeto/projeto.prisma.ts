@@ -176,21 +176,21 @@ export class ProjetoPrisma {
     };
 
     resultado.escolas = resultado.escolas.sort((a, b) => {
-      const categoria = (escola: typeof a) => {
-        if (escola.grades.length === 0) return 2; // Sem grades
-        if (escola.grades.some(g => g.iniciada)) return 0; // Com grade iniciada
-        return 1; // Com grades, mas nenhuma iniciada
+      const getCategoria = (escola: typeof a): number => {
+        const grades = escola.grades;
+        if (grades.length === 0) return 3; // Sem grades
+        if (grades.some(g => g.iniciada)) return 0; // Alguma iniciada
+        const todasFinalizadas = grades.every(g =>
+          g.status === 'EXPEDIDA' || g.status === 'DESPACHADA'
+        );
+        return todasFinalizadas ? 2 : 1; // Finalizadas ou ainda em progresso
       };
-
-      const catA = categoria(a);
-      const catB = categoria(b);
-
+      const catA = getCategoria(a);
+      const catB = getCategoria(b);
       if (catA !== catB) return catA - catB;
-
-      const toNum = (val: string) => parseInt(val) || 0;
+      const toNum = (val: string) => parseInt(val, 10) || 0;
       return toNum(a.numeroEscola) - toNum(b.numeroEscola);
     });
-
     return resultado;
   }
 
