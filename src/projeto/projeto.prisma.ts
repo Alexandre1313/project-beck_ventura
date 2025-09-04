@@ -46,8 +46,25 @@ export class ProjetoPrisma {
     return projetos;
   }
 
-  async obterAll(): Promise<Projeto[]> {
-    const projetos = await this.prisma.projeto.findMany();
+  async obterAll(): Promise<(Projeto & { isActive: boolean })[]> {
+    const projetos = await this.prisma.$queryRaw<(Projeto & { isActive: boolean })[]>`
+    SELECT 
+      p.*,
+      CASE 
+        WHEN EXISTS (
+          SELECT 1
+          FROM "Escola" e
+          JOIN "Grade" g ON g."escolaId" = e.id
+          WHERE e."projetoId" = p.id
+          AND g.status <> 'DESPACHADA'
+          LIMIT 1
+        ) 
+        THEN TRUE 
+        ELSE FALSE 
+      END AS "isActive"
+    FROM "Projeto" p
+    ORDER BY "isActive" DESC, p.nome ASC;
+  `;
     return projetos;
   }
 
