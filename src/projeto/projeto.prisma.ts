@@ -73,6 +73,7 @@ export class ProjetoPrisma {
     return (projeto as Projeto) ?? null;
   }
 
+  /*
   async obterPorIdEscolas(id: number): Promise<(Omit<Projeto, 'escolas'> & { escolas: (Omit<Escola, 'grades'> & { grades: (Grade & { iniciada: boolean })[]; })[]; }) | null> {
     const projeto = await this.prisma.projeto.findUnique({
       where: { id },
@@ -122,6 +123,73 @@ export class ProjetoPrisma {
           }),
       })),
     };
+
+    return resultado;
+  }*/
+
+  async obterPorIdEscolas(id: number): Promise<(Omit<Projeto, 'escolas'> & { escolas: (Omit<Escola, 'grades'> & { grades: (Grade & { iniciada: boolean })[]; })[]; }) | null> {
+    const projeto = await this.prisma.projeto.findUnique({
+      where: { id },
+      include: {
+        escolas: {
+          include: {
+            grades: {
+              orderBy: { createdAt: 'desc' },
+              take: 7,
+              include: {
+                itensGrade: {
+                  select: { quantidadeExpedida: true },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!projeto) return null;
+
+    const limite = subMinutes(new Date(), 30);
+
+    const resultado = {
+      ...projeto,
+      escolas: projeto.escolas.map((escola) => ({
+        ...escola,
+        grades: escola.grades
+          .filter((grade) => {
+            if (grade.status === 'DESPACHADA') {
+              return isAfter(grade.updatedAt, limite);
+            }
+            return true;
+          })
+          .map((grade) => {
+            const iniciada = grade.itensGrade.some(
+              (item) => item.quantidadeExpedida > 0
+            );
+            const { itensGrade, ...resto } = grade;
+            return {
+              ...resto,
+              iniciada,
+            };
+          }),
+      })),
+    };
+
+    resultado.escolas = resultado.escolas.sort((a, b) => {
+      const categoria = (escola: typeof a) => {
+        if (escola.grades.length === 0) return 2; // Sem grades
+        if (escola.grades.some(g => g.iniciada)) return 0; // Com grade iniciada
+        return 1; // Com grades, mas nenhuma iniciada
+      };
+
+      const catA = categoria(a);
+      const catB = categoria(b);
+
+      if (catA !== catB) return catA - catB;
+
+      const toNum = (val: string) => parseInt(val) || 0;
+      return toNum(a.numeroEscola) - toNum(b.numeroEscola);
+    });
 
     return resultado;
   }
