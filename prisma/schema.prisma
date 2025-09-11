@@ -119,8 +119,21 @@ model Item {
   composicao String?
   projeto    Projeto       @relation(fields: [projetoId], references: [id])
   tamanhos   ItemTamanho[]
+  Fabric     Fabric?       @relation(fields: [fabricId], references: [id])
+  fabricId   Int?
 
   @@unique([nome, projetoId, genero])
+}
+
+model Fabric {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(100)
+  grammage  Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  items     Item[]
+
+  @@unique([name, grammage])
 }
 
 model Tamanho {
