@@ -1,4 +1,4 @@
-import { Item as PrismaItem, Genero as PrismaGenero } from '@prisma/client';
+import { Item as PrismaItem, Genero as PrismaGenero, Prisma, PrismaClient } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
 import { PrismaProvider } from 'src/db/prisma.provider';
 import { Item } from '@core/index';
@@ -39,7 +39,7 @@ export class ItemPrisma {
         const itens = await this.prisma.item.findMany({
             include: {
                 tamanhos: true,
-                projeto: true,               
+                projeto: true,
             },
         });
 
@@ -99,4 +99,56 @@ export class ItemPrisma {
                 throw new Error('Gênero inválido');
         }
     }
+
+    async getExitFabrics() {
+        // 1. Busca todos os outputs com join necessário
+        const saidas = await this.prisma.outInput.findMany({
+            include: {
+                itemTamanho: {
+                    include: {
+                        item: {
+                            include: {
+                                Fabric: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        // 2. Agrupa os dados por Fabric
+        const agrupado: Record<string, { nome: string; grammage: number; total: number }> = {};
+        let totalGeral = 0;
+
+        for (const saida of saidas) {
+            const item = saida.itemTamanho.item;
+            const fabric = item?.Fabric;
+
+            if (!fabric) continue;
+
+            const key = `${fabric.id}`;
+            if (!agrupado[key]) {
+                agrupado[key] = {
+                    nome: fabric.name,
+                    grammage: fabric.grammage,
+                    total: 0,
+                };
+            }
+
+            agrupado[key].total += saida.quantidade;
+            totalGeral += saida.quantidade;
+        }
+
+        // 3. Transforma em lista com porcentagem
+        const resultado = Object.values(agrupado).map((fabric) => ({
+            name: fabric.nome,
+            grammage: fabric.grammage,
+            total: fabric.total,
+            totalgeral: totalGeral,
+            percent: ((fabric.total / totalGeral) * 100).toFixed(2) + "%",
+        }));
+
+        return resultado;
+    }
+
 }

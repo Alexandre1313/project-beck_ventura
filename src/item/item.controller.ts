@@ -23,6 +23,16 @@ export class ItemController {
     return this.repo.obter();
   }
 
+  // Obter fabrics
+  @Get('fabrics')
+  async obterFabrics(): Promise<any[]> {
+    const fabrics = await this.repo.getExitFabrics();
+    if (!fabrics) {
+      throw new NotFoundException(`Não há dados para os parãmetros pesquisados.`);
+    }
+    return fabrics;
+  }
+
   // Obter um item específico pelo ID
   @Get(':id')
   async obterItem(@Param('id') id: string): Promise<Item> {
