@@ -3,7 +3,7 @@ import * as XLSX from 'xlsx';
 import * as path from 'path';
 
 const baseDir = path.join(process.cwd(), 'core', 'utils', 'docs_proj_end');
-const filename = `cadendereco.xlsx'`;
+const filename = `cadendereco.xlsx`;
 const filePath = path.join(baseDir, filename);
 
 export default function utilitiesEndereco(caminhoPlanilha: string = filePath): EnderecoInserction[] {

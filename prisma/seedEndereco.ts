@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import * as readline from 'readline';
 import { EnderecoInserction } from '@core/interfaces';
 import utilitiesEndereco from '../core/utils/utilitiesEndereco';
+//import * as path from 'path';
 
 const prisma = new PrismaClient();
 
