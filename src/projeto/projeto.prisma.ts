@@ -182,26 +182,26 @@ export class ProjetoPrisma {
       const getCategoria = (escola: typeof a): number => {
         const grades = escola.grades;
         if (grades.length === 0) return 4; // Sem grades - ÚLTIMO
-        
-        // Verificar se tem alguma grade iniciada
-        if (grades.some(g => g.iniciada)) return 1; // Iniciada - PRIMEIRO
-        
+
         // Verificar se todas as grades estão finalizadas (expedidas/despachadas)
         const todasFinalizadas = grades.every(g =>
           g.status === 'EXPEDIDA' || g.status === 'DESPACHADA'
         );
-        
+
         if (todasFinalizadas) return 3; // Expedida - TERCEIRO
-        
+
+        // Verificar se tem alguma grade iniciada (mas não expedida)
+        if (grades.some(g => g.iniciada)) return 1; // Iniciada - PRIMEIRO
+
         return 2; // Não iniciada - SEGUNDO
       };
 
       const catA = getCategoria(a);
       const catB = getCategoria(b);
-      
+
       // Se as categorias são diferentes, ordenar por categoria
       if (catA !== catB) return catA - catB;
-      
+
       // Se as categorias são iguais, ordenar por número da escola
       const toNum = (val: string) => parseInt(val, 10) || 0;
       return toNum(a.numeroEscola) - toNum(b.numeroEscola);
