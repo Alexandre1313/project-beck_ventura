@@ -137,6 +137,7 @@ export class ProjetoPrisma {
               orderBy: { createdAt: 'desc' },
               take: 7,
               include: {
+                // Inclui apenas para uso interno
                 itensGrade: {
                   select: { quantidadeExpedida: true },
                 },
@@ -166,6 +167,7 @@ export class ProjetoPrisma {
             const iniciada = grade.itensGrade.some(
               (item) => item.quantidadeExpedida > 0
             );
+            // Retorna grade com iniciada, mas sem os gradeItens
             const { itensGrade, ...resto } = grade;
             return {
               ...resto,
@@ -175,22 +177,36 @@ export class ProjetoPrisma {
       })),
     };
 
+    // ✅ ORDENAÇÃO CORRETA DAS ESCOLAS
     resultado.escolas = resultado.escolas.sort((a, b) => {
       const getCategoria = (escola: typeof a): number => {
         const grades = escola.grades;
-        if (grades.length === 0) return 3; // Sem grades
-        if (grades.some(g => g.iniciada)) return 0; // Alguma iniciada
+        if (grades.length === 0) return 4; // Sem grades - ÚLTIMO
+        
+        // Verificar se tem alguma grade iniciada
+        if (grades.some(g => g.iniciada)) return 1; // Iniciada - PRIMEIRO
+        
+        // Verificar se todas as grades estão finalizadas (expedidas/despachadas)
         const todasFinalizadas = grades.every(g =>
           g.status === 'EXPEDIDA' || g.status === 'DESPACHADA'
         );
-        return todasFinalizadas ? 2 : 1; // Finalizadas ou ainda em progresso
+        
+        if (todasFinalizadas) return 3; // Expedida - TERCEIRO
+        
+        return 2; // Não iniciada - SEGUNDO
       };
+
       const catA = getCategoria(a);
       const catB = getCategoria(b);
+      
+      // Se as categorias são diferentes, ordenar por categoria
       if (catA !== catB) return catA - catB;
+      
+      // Se as categorias são iguais, ordenar por número da escola
       const toNum = (val: string) => parseInt(val, 10) || 0;
       return toNum(a.numeroEscola) - toNum(b.numeroEscola);
     });
+
     return resultado;
   }
 
