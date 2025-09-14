@@ -127,7 +127,7 @@ export class ProjetoPrisma {
     return resultado;
   }*/
 
-  async obterPorIdEscolas(id: number): Promise<(Omit<Projeto, 'escolas'> & { escolas: (Omit<Escola, 'grades'> & { grades: (Grade & { iniciada: boolean })[]; })[]; }) | null> {
+  async obterPorIdEscolas(id: number): Promise<(Omit<Projeto, 'escolas'> & { escolas: (Omit<Escola, 'grades'> & { grades: (Grade & { iniciada: boolean })[]; percentualProgresso: number; })[]; }) | null> {
     const projeto = await this.prisma.projeto.findUnique({
       where: { id },
       include: {
@@ -137,9 +137,12 @@ export class ProjetoPrisma {
               orderBy: { createdAt: 'desc' },
               take: 7,
               include: {
-                // Inclui apenas para uso interno
+                // Inclui dados completos dos itens para cálculo do progresso
                 itensGrade: {
-                  select: { quantidadeExpedida: true },
+                  select: {
+                    quantidade: true,
+                    quantidadeExpedida: true
+                  },
                 },
               },
             },
@@ -154,27 +157,47 @@ export class ProjetoPrisma {
 
     const resultado = {
       ...projeto,
-      escolas: projeto.escolas.map((escola) => ({
-        ...escola,
-        grades: escola.grades
-          .filter((grade) => {
-            if (grade.status === 'DESPACHADA') {
-              return isAfter(grade.updatedAt, limite);
-            }
-            return true;
-          })
-          .map((grade) => {
-            const iniciada = grade.itensGrade.some(
-              (item) => item.quantidadeExpedida > 0
-            );
-            // Retorna grade com iniciada, mas sem os gradeItens
-            const { itensGrade, ...resto } = grade;
-            return {
-              ...resto,
-              iniciada,
-            };
-          }),
-      })),
+      escolas: projeto.escolas.map((escola) => {
+        // ✅ CÁLCULO DO PERCENTUAL DE PROGRESSO
+        let totalPrevisto = 0;
+        let totalExpedido = 0;
+
+        // Soma todas as quantidades de todas as grades da escola
+        escola.grades.forEach((grade) => {
+          grade.itensGrade.forEach((item) => {
+            totalPrevisto += item.quantidade;
+            totalExpedido += item.quantidadeExpedida;
+          });
+        });
+
+        // Calcula o percentual (0-100)
+        const percentualProgresso = totalPrevisto > 0
+          ? Math.round((totalExpedido / totalPrevisto) * 100)
+          : 0;
+
+        return {
+          ...escola,
+          percentualProgresso, // ✅ NOVO CAMPO ADICIONADO
+          grades: escola.grades
+            .filter((grade) => {
+              if (grade.status === 'DESPACHADA') {
+                return isAfter(grade.updatedAt, limite);
+              }
+              return true;
+            })
+            .map((grade) => {
+              const iniciada = grade.itensGrade.some(
+                (item) => item.quantidadeExpedida > 0
+              );
+              // Retorna grade com iniciada, mas sem os gradeItens
+              const { itensGrade, ...resto } = grade;
+              return {
+                ...resto,
+                iniciada,
+              };
+            }),
+        };
+      }),
     };
 
     // ✅ ORDENAÇÃO CORRETA DAS ESCOLAS
