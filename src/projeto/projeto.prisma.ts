@@ -162,18 +162,18 @@ export class ProjetoPrisma {
         let totalPrevisto = 0;
         let totalExpedido = 0;
 
-        // Soma todas as quantidades de todas as grades da escola
-        escola.grades.forEach((grade) => {
+        // Considera apenas grades diferentes de "DESPACHADA" para o cálculo
+        const gradesValidas = escola.grades.filter((grade) => grade.status !== 'DESPACHADA');
+
+        gradesValidas.forEach((grade) => {
           grade.itensGrade.forEach((item) => {
             totalPrevisto += item.quantidade;
             totalExpedido += item.quantidadeExpedida;
           });
         });
 
-        // Calcula o percentual (0-100)
-        const percentualProgresso = totalPrevisto > 0
-          ? Math.round((totalExpedido / totalPrevisto) * 100)
-          : 0;
+        const percentualProgresso =
+          totalPrevisto > 0 ? Math.round((totalExpedido / totalPrevisto) * 100) : 0;
 
         return {
           ...escola,
@@ -189,7 +189,6 @@ export class ProjetoPrisma {
               const iniciada = grade.itensGrade.some(
                 (item) => item.quantidadeExpedida > 0
               );
-              // Retorna grade com iniciada, mas sem os gradeItens
               const { itensGrade, ...resto } = grade;
               return {
                 ...resto,
