@@ -136,8 +136,8 @@ async function seed2() {
                             remessa: remessa,
                             escolaId: escola.id,
                             companyId: companyId,
-                            //createdAt: "2025-02-17T11:39:00.739Z", 
-                            //updatedAt: "2025-02-17T11:39:00.739Z",
+                            //createdAt: "2025-09-15T12:00:00.000Z", 
+                            //updatedAt: "2025-09-15T12:00:00.000Z",
                             tipo: tipo || null,
                         },
                     });
