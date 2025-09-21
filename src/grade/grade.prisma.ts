@@ -1037,20 +1037,39 @@ export class GradePrisma {
 
           for (const data of sortedDates) {
             const escolaGroups = dateGroups[data];
-            const sortedEscolas = Object.keys(escolaGroups).sort();
+            // Ordena escolas pelo número da escola (extraindo o número do formato "Nome - Escola #123")
+            const sortedEscolas = Object.keys(escolaGroups).sort((a, b) => {
+              const numA = parseInt(a.split('#')[1]) || 0;
+              const numB = parseInt(b.split('#')[1]) || 0;
+              return numA - numB;
+            });
 
             for (const escola of sortedEscolas) {
               const items = escolaGroups[escola];
 
-              // Ordena dentro da escola por item → genero → tamanho_ordem
+              // Ordena dentro da escola por item → genero → tamanho (numéricos primeiro, depois alfabéticos)
               items.sort((x, y) => {
                 if (x.item !== y.item) return x.item.localeCompare(y.item);
                 if (x.genero !== y.genero) return x.genero.localeCompare(y.genero);
 
-                // Usa ordem do CASE para tamanhos
-                const ordX = tamanhoPriority[x.tamanho] ?? (x.tamanho.match(/^\d+$/) ? parseInt(x.tamanho) : 999);
-                const ordY = tamanhoPriority[y.tamanho] ?? (y.tamanho.match(/^\d+$/) ? parseInt(y.tamanho) : 999);
-                return ordX - ordY;
+                // Verifica se são tamanhos numéricos (pode ser "2", "02", "04", etc.)
+                const isNumX = /^\d+$/.test(x.tamanho);
+                const isNumY = /^\d+$/.test(y.tamanho);
+
+                // Se ambos são numéricos, ordena numericamente
+                if (isNumX && isNumY) {
+                  return parseInt(x.tamanho) - parseInt(y.tamanho);
+                }
+
+                // Se ambos são alfabéticos, usa a ordem do array sizes
+                if (!isNumX && !isNumY) {
+                  const ordX = tamanhoPriority[x.tamanho] ?? 999;
+                  const ordY = tamanhoPriority[y.tamanho] ?? 999;
+                  return ordX - ordY;
+                }
+
+                // Se um é numérico e outro alfabético, numérico vem primeiro
+                return isNumX ? -1 : 1;
               });
 
               const subtotalPrevisto = items.reduce((sum, x) => sum + x.previsto, 0);
@@ -1301,24 +1320,40 @@ export class GradePrisma {
 
           for (const data of sortedDates) {
             const escolaGroups = dateGroups[data];
-            const sortedEscolas = Object.keys(escolaGroups).sort();
+            // Ordena escolas pelo número da escola (extraindo o número do formato "Nome - Escola #123")
+            const sortedEscolas = Object.keys(escolaGroups).sort((a, b) => {
+              const numA = parseInt(a.split('#')[1]) || 0;
+              const numB = parseInt(b.split('#')[1]) || 0;
+              return numA - numB;
+            });
 
             for (const escola of sortedEscolas) {
               const itemsMap = escolaGroups[escola];
               const items = Object.values(itemsMap);
 
-              // Ordena por item → genero → tamanho
+              // Ordena por item → genero → tamanho (numéricos primeiro, depois alfabéticos)
               items.sort((x, y) => {
                 if (x.item !== y.item) return x.item.localeCompare(y.item);
                 if (x.genero !== y.genero) return x.genero.localeCompare(y.genero);
 
-                const isNumX = x.tamanho.match(/^\d+$/);
-                const isNumY = y.tamanho.match(/^\d+$/);
+                // Verifica se são tamanhos numéricos (pode ser "2", "02", "04", etc.)
+                const isNumX = /^\d+$/.test(x.tamanho);
+                const isNumY = /^\d+$/.test(y.tamanho);
 
-                const ordX = isNumX ? parseInt(x.tamanho) : 100 + (tamanhoPriority[x.tamanho] ?? 999);
-                const ordY = isNumY ? parseInt(y.tamanho) : 100 + (tamanhoPriority[y.tamanho] ?? 999);
+                // Se ambos são numéricos, ordena numericamente
+                if (isNumX && isNumY) {
+                  return parseInt(x.tamanho) - parseInt(y.tamanho);
+                }
 
-                return ordX - ordY;
+                // Se ambos são alfabéticos, usa a ordem do array sizes
+                if (!isNumX && !isNumY) {
+                  const ordX = tamanhoPriority[x.tamanho] ?? 999;
+                  const ordY = tamanhoPriority[y.tamanho] ?? 999;
+                  return ordX - ordY;
+                }
+
+                // Se um é numérico e outro alfabético, numérico vem primeiro
+                return isNumX ? -1 : 1;
               });
 
               const subtotalPrevisto = items.reduce((sum, x) => sum + x.previsto, 0);
