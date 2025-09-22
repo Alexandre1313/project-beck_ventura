@@ -367,7 +367,7 @@ export class EscolaPrisma {
       // Função para mapear o status para um valor numérico para facilitar a ordenação
       const statusPriority = (status: string) => {
         switch (status) {
-          case 'PRONTA': return 1;
+          case 'PENDENTE': return 1;
           case 'EXPEDIDA': return 2;
           case 'IMPRESSA': return 3;
           case 'DESPACHADA': return 4;

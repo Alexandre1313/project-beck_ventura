@@ -854,7 +854,7 @@ export class ProjetoPrisma {
   async getProjetoComResumoExpedicao(
     projectId: number,
     remessa: number,
-    status: "EXPEDIDA" | "DESPACHADA" | "PRONTA" | "IMPRESSA" | "TODAS",
+    status: "EXPEDIDA" | "DESPACHADA" | "PENDENTE" | "IMPRESSA" | "TODAS",
     tipo: string,
   ): Promise<GradesRomaneio[]> {
     try {
@@ -1026,7 +1026,7 @@ export class ProjetoPrisma {
       );
 
       if (status === "TODAS") {
-        const statusOrder = { PRONTA: 1, EXPEDIDA: 2, DESPACHADA: 3, IMPRESSA: 4 };
+        const statusOrder = { PENDENTE: 1, EXPEDIDA: 2, DESPACHADA: 3, IMPRESSA: 4 };
 
         // Ordenação primeiro pelo status
         formattedData = formattedData.sort((a, b) =>
@@ -1045,8 +1045,8 @@ export class ProjetoPrisma {
         });
       }
 
-      // Ordenação se for "PRONTA"
-      if (status === "PRONTA") {
+      // Ordenação se for "PENDENTE"
+      if (status === "PENDENTE") {
         formattedData = formattedData.sort((a, b) => {
           const totalA = a.tamanhosQuantidades.reduce((sum, item) => sum + item.quantidade, 0);
           const totalB = b.tamanhosQuantidades.reduce((sum, item) => sum + item.quantidade, 0);
@@ -1183,7 +1183,7 @@ export class ProjetoPrisma {
   async getProjetoComResumoExpedicaoPP(
     projectId: number,
     remessa: number,
-    status: "EXPEDIDA" | "DESPACHADA" | "PRONTA" | "IMPRESSA" | "TODAS",
+    status: "EXPEDIDA" | "DESPACHADA" | "PENDENTE" | "IMPRESSA" | "TODAS",
     tipo: string,
   ): Promise<GradesRomaneio[]> {
     try {
@@ -1394,7 +1394,7 @@ export class ProjetoPrisma {
 
       // Ordenações conforme status
       if (status === "TODAS") {
-        const statusOrder = { PRONTA: 1, EXPEDIDA: 2, DESPACHADA: 3, IMPRESSA: 4 };
+        const statusOrder = { PENDENTE: 1, EXPEDIDA: 2, DESPACHADA: 3, IMPRESSA: 4 };
         finalData = finalData.sort((a, b) => {
           if (a.status === b.status) {
             return parseInt(a.numeroEscola, 10) - parseInt(b.numeroEscola, 10);
@@ -1403,7 +1403,7 @@ export class ProjetoPrisma {
         });
       }
 
-      if (status === "PRONTA") {
+      if (status === "PENDENTE") {
         finalData = finalData.sort((a, b) => {
           const totalA = a.tamanhosQuantidades.reduce((sum, item) => sum + item.quantidade, 0);
           const totalB = b.tamanhosQuantidades.reduce((sum, item) => sum + item.quantidade, 0);

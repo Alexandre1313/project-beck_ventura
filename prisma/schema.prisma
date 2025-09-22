@@ -213,7 +213,7 @@ model Grade {
   updatedAt   DateTime    @updatedAt
   companyId   Int
   tipo        String?
-  status      Status      @default(PRONTA)
+  status      Status      @default(PENDENTE)
   remessa     Int?
   gradeCaixas Caixa[]
   company     Company     @relation(fields: [companyId], references: [id])
@@ -370,9 +370,10 @@ enum Genero {
   UNISSEX
 }
 
-enum Status {
-  PRONTA
+enum Status { 
   EXPEDIDA
   IMPRESSA
   DESPACHADA
+  PENDENTE
+  PRONTA
 }

@@ -91,7 +91,7 @@ export async function gerarPDFExpedicao(resumo: ExpedicaoResumoPDGrouped[]): Pro
           fillColor = '#0000ff';  // azul
         } else if (statusText.toUpperCase().includes('EXPEDIDA')) {
           fillColor = '#008000';  // verde
-        } else if (statusText.toUpperCase().includes('PRONTA')) {
+        } else if (statusText.toUpperCase().includes('PENDENTE')) {
           fillColor = '#FFFF00';
         }
 
@@ -102,7 +102,7 @@ export async function gerarPDFExpedicao(resumo: ExpedicaoResumoPDGrouped[]): Pro
               return 'REMETIDO AO CLIENTE - DESPACHADA';
             case 'EXPEDIDA':
               return 'FINALIZADO - AGUARDANDO ENVIO';
-            case 'PRONTA':
+            case 'PENDENTE':
               return 'EM ANDAMENTO';
             default:
               return status; // retorna como está se não reconhecer
@@ -306,7 +306,7 @@ export async function gerarPDFExpedicaoComEscola(resumo: ExpedicaoResumoPDGroupe
     // Status - cores mais suaves e intuitivas
     DESPACHADA: { bg: '#e3f2fd', text: '#1565c0', border: '#2196f3' },
     EXPEDIDA: { bg: '#e8f5e8', text: '#2e7d32', border: '#4caf50' },
-    PRONTA: { bg: '#fff3e0', text: '#ef6c00', border: '#ff9800' },
+    PENDENTE: { bg: '#fff3e0', text: '#ef6c00', border: '#ff9800' },
     
     // Hierarquia visual
     PROJECT_HEADER: '#37474f',
@@ -384,8 +384,8 @@ export async function gerarPDFExpedicaoComEscola(resumo: ExpedicaoResumoPDGroupe
           statusColors = { bg: COLORS.DESPACHADA.bg, text: COLORS.DESPACHADA.text };
         } else if (statusText.toUpperCase().includes('EXPEDIDA')) {
           statusColors = { bg: COLORS.EXPEDIDA.bg, text: COLORS.EXPEDIDA.text };
-        } else if (statusText.toUpperCase().includes('PRONTA')) {
-          statusColors = { bg: COLORS.PRONTA.bg, text: COLORS.PRONTA.text };
+        } else if (statusText.toUpperCase().includes('PENDENTE')) {
+          statusColors = { bg: COLORS.PENDENTE.bg, text: COLORS.PENDENTE.text };
         }
 
         function traduzirStatus(status: string): string {
@@ -395,7 +395,7 @@ export async function gerarPDFExpedicaoComEscola(resumo: ExpedicaoResumoPDGroupe
               return '🚚 REMETIDO AO CLIENTE - DESPACHADA';
             case 'EXPEDIDA':
               return '📦 FINALIZADO - AGUARDANDO ENVIO';
-            case 'PRONTA':
+            case 'PENDENTE':
               return '⚙️ EM ANDAMENTO';
             default:
               return status;

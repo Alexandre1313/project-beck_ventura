@@ -81,7 +81,7 @@ export class GradePrisma {
             include: { itensGrade: true },
           });
 
-          if (!grade || grade.status !== "PRONTA") {
+          if (!grade || grade.status !== "PENDENTE") {
             return null;
           }
 
@@ -144,7 +144,7 @@ export class GradePrisma {
               escolaId: grade.escolaId,
               finalizada: false,
               tipo: grade.tipo?.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toUpperCase() === 'REPOSICAO' ? 'REPOSIÇÃO' : null,
-              status: 'PRONTA' as Status,
+              status: 'PENDENTE' as Status,
               remessa: grade.remessa,
               itensGrade: itemsParaCriarNovaGrade,
             };
@@ -293,9 +293,9 @@ export class GradePrisma {
       ORDER BY
         projectname,
         CASE status
-          WHEN 'DESPACHADA' THEN 1
+          WHEN 'DESPACHADA' THEN 3
           WHEN 'EXPEDIDA' THEN 2
-          WHEN 'PRONTA' THEN 3
+          WHEN 'PENDENTE' THEN 1
           ELSE 99
         END,
         data DESC NULLS LAST,
@@ -338,7 +338,7 @@ export class GradePrisma {
         });
       }
 
-      const statusOrder = ['DESPACHADA', 'EXPEDIDA', 'PRONTA'];
+      const statusOrder = ['PENDENTE', 'EXPEDIDA', 'DESPACHADA'];
       const resultado: ExpedicaoResumoPDGrouped[] = [];
 
       for (const [projectname, statuses] of Object.entries(grouped)) {
@@ -502,9 +502,9 @@ export class GradePrisma {
       ORDER BY
         projectname,
         CASE status
-          WHEN 'DESPACHADA' THEN 1
+          WHEN 'DESPACHADA' THEN 3
           WHEN 'EXPEDIDA' THEN 2
-          WHEN 'PRONTA' THEN 3
+          WHEN 'PENDENTE' THEN 1
           ELSE 99
         END,
         data DESC NULLS LAST,
@@ -554,7 +554,7 @@ export class GradePrisma {
         }
       }
 
-      const statusOrder = ['DESPACHADA', 'EXPEDIDA', 'PRONTA'];
+      const statusOrder = ['PENDENTE', 'EXPEDIDA', 'DESPACHADA'];
       const resultado: ExpedicaoResumoPDGrouped[] = [];
 
       for (const [projectname, statuses] of Object.entries(grouped)) {
@@ -718,7 +718,7 @@ export class GradePrisma {
       ORDER BY
         projectname,
         CASE status
-          WHEN 'PRONTA' THEN 1
+          WHEN 'PENDENTE' THEN 1
           WHEN 'EXPEDIDA' THEN 2
           WHEN 'DESPACHADA' THEN 3
           ELSE 99
@@ -773,7 +773,7 @@ export class GradePrisma {
         }
       }
 
-      const statusOrder = ['PRONTA', 'EXPEDIDA', 'DESPACHADA'];
+      const statusOrder = ['PENDENTE', 'EXPEDIDA', 'DESPACHADA'];
       const resultado: ExpedicaoResumoPDGrouped[] = [];
 
       for (const [projectname, statuses] of Object.entries(grouped)) {
@@ -943,9 +943,9 @@ export class GradePrisma {
       ORDER BY
         projectname,
         CASE status
-          WHEN 'DESPACHADA' THEN 1
+          WHEN 'DESPACHADA' THEN 3
           WHEN 'EXPEDIDA' THEN 2
-          WHEN 'PRONTA' THEN 3
+          WHEN 'PENDENTE' THEN 1
           ELSE 99
         END,
         data DESC NULLS LAST,
@@ -996,7 +996,7 @@ export class GradePrisma {
         });
       }
 
-      const statusOrder = ['DESPACHADA', 'EXPEDIDA', 'PRONTA'];
+      const statusOrder = ['PENDENTE', 'EXPEDIDA', 'DESPACHADA'];
       const resultado: ExpedicaoResumoPDGrouped[] = [];
 
       for (const [projectname, statuses] of Object.entries(grouped)) {
@@ -1219,9 +1219,9 @@ export class GradePrisma {
       ORDER BY
         projectname,
         CASE status
-          WHEN 'DESPACHADA' THEN 1
+          WHEN 'DESPACHADA' THEN 3
           WHEN 'EXPEDIDA' THEN 2
-          WHEN 'PRONTA' THEN 3
+          WHEN 'PENDENTE' THEN 1
           ELSE 99
         END,
         data DESC NULLS LAST,
@@ -1279,7 +1279,7 @@ export class GradePrisma {
         }
       }
 
-      const statusOrder = ['DESPACHADA', 'EXPEDIDA', 'PRONTA'];
+      const statusOrder = ['PENDENTE', 'EXPEDIDA', 'DESPACHADA'];
       const resultado: ExpedicaoResumoPDGrouped[] = [];
 
       for (const [projectname, statuses] of Object.entries(grouped)) {

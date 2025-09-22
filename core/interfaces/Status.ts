@@ -1,6 +1,7 @@
 export enum Status {
-    PRONTA = "PRONTA",
+    PENDENTE = "PENDENTE",
     EXPEDIDA = "EXPEDIDA",
     IMPRESSA = "IMPRESSA",
-    DESPACHADA = "DESPACHADA"
+    DESPACHADA = "DESPACHADA",
+    PRONTA = "PRONTA"
 }

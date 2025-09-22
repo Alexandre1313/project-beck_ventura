@@ -83,13 +83,13 @@ export class ProjetoController {
     @Param('tipo') tipo: string
   ): Promise<GradesRomaneio[]> {
     // Lista de status válidos
-    const validStatuses = ["EXPEDIDA", "DESPACHADA", "PRONTA", "IMPRESSA", "TODAS"];
+    const validStatuses = ["EXPEDIDA", "DESPACHADA", "PENDENTE", "IMPRESSA", "TODAS"];
     // Verifica se o status recebido é válido
     if (!validStatuses.includes(status.toUpperCase())) {
       throw new BadRequestException(`Status inválido. Use um dos seguintes: ${validStatuses.join(', ')}`);
     }
     // Chama a função passando os parâmetros convertidos
-    const resume = await this.repo.getProjetoComResumoExpedicao(+id, +remessa, status.toUpperCase() as "EXPEDIDA" | "DESPACHADA" | "PRONTA" | "IMPRESSA" | "TODAS", tipo);
+    const resume = await this.repo.getProjetoComResumoExpedicao(+id, +remessa, status.toUpperCase() as "EXPEDIDA" | "DESPACHADA" | "PENDENTE" | "IMPRESSA" | "TODAS", tipo);
     if (!resume || resume.length === 0) {
       throw new NotFoundException(`Não foram encontrados dados referente ao projeto.`);
     }
@@ -168,13 +168,13 @@ export class ProjetoController {
     @Param('tipo') tipo: string
   ): Promise<GradesRomaneio[]> {
     // Lista de status válidos
-    const validStatuses = ["EXPEDIDA", "DESPACHADA", "PRONTA", "IMPRESSA", "TODAS"];
+    const validStatuses = ["EXPEDIDA", "DESPACHADA", "PENDENTE", "IMPRESSA", "TODAS"];
     // Verifica se o status recebido é válido
     if (!validStatuses.includes(status.toUpperCase())) {
       throw new BadRequestException(`Status inválido. Use um dos seguintes: ${validStatuses.join(', ')}`);
     }
     // Chama a função passando os parâmetros convertidos
-    const resume = await this.repo.getProjetoComResumoExpedicaoPP(+id, +remessa, status.toUpperCase() as "EXPEDIDA" | "DESPACHADA" | "PRONTA" | "IMPRESSA" | "TODAS", tipo);
+    const resume = await this.repo.getProjetoComResumoExpedicaoPP(+id, +remessa, status.toUpperCase() as "EXPEDIDA" | "DESPACHADA" | "PENDENTE" | "IMPRESSA" | "TODAS", tipo);
     if (!resume || resume.length === 0) {
       throw new NotFoundException(`Não foram encontrados dados referente ao projeto.`);
     }
