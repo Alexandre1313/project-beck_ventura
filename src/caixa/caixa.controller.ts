@@ -37,10 +37,20 @@ export class CaixaController {
 
   // Modificar itens da caixa
   @Post('/updatedbox')
-  @HttpCode(HttpStatus.CREATED)
-  async modificarQuantidadesDaCaixa(@Body() caixa: CaixaAjuste): Promise<CaixaAjuste | null> {
+  async modificarQuantidadesDaCaixa(@Body() caixa: CaixaAjuste): Promise<CaixaAjuste | { status: string; mensagem: string; caixa: CaixaAjuste }> {
     try {
-      return await this.repo.updateItensByBox(caixa);
+      const resultado = await this.repo.updateItensByBox(caixa);
+
+      // Verificar se a caixa foi excluída
+      if (resultado && 'status' in resultado && (resultado as any).status === 'EXCLUIDA') {
+        return {
+          status: 'EXCLUIDA',
+          mensagem: (resultado as any).mensagem,
+          caixa: resultado as CaixaAjuste
+        };
+      }
+
+      return resultado as CaixaAjuste;
     } catch (error) {
       throw new BadRequestException('Erro ao modificar os itens da caixa: ' + error.message);
     }
