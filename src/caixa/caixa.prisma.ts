@@ -334,7 +334,6 @@ export class CaixaPrisma {
             const quantidadeAtual = caixaItemAtual.itemQty;
             const diff = quantidadeAtual - itemQty;
 
-
             if (itemTamanho.isKit) {
               // PROCESSAR KIT
 
