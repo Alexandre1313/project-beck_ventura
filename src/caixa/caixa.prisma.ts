@@ -334,6 +334,16 @@ export class CaixaPrisma {
             const quantidadeAtual = caixaItemAtual.itemQty;
             const diff = quantidadeAtual - itemQty;
 
+            // 🔍 DEBUG LOG
+            console.log(`
+              🔍 AJUSTE DE ITEM:
+              ItemTamanhoId: ${itemTamanhoId}
+              Quantidade Atual (CaixaItem): ${quantidadeAtual}
+              Nova Quantidade (itemQty): ${itemQty}
+              Diferença (diff): ${diff}
+              É Kit?: ${itemTamanho.isKit}
+            `);
+
             if (itemTamanho.isKit) {
               // PROCESSAR KIT
 
@@ -386,13 +396,13 @@ export class CaixaPrisma {
 
                   // Ajustar estoque se houver diferença
                   if (diffComponentes !== 0) {
-                    // diffComponentes é negativo quando reduzimos kits (devolve para estoque)
-                    // Usar diffComponentes diretamente pois o Prisma increment aceita valores negativos
+                    // ✅ CORREÇÃO: diffComponentes já tem o sinal correto
+                    // Se positivo: devolver para estoque | Se negativo: retirar do estoque
                     await prisma.estoque.update({
                       where: { id: outInputComponente.estoqueId },
                       data: {
                         quantidade: {
-                          increment: -diffComponentes // Negativo de negativo = positivo (devolve para estoque)
+                          increment: diffComponentes // ✅ CORRETO: Prisma increment aceita valores negativos
                         }
                       }
                     });
@@ -459,6 +469,15 @@ export class CaixaPrisma {
               }
 
               if (itemQty === 0) {
+                // 🔍 DEBUG LOG ZERAR
+                console.log(`
+                  🗑️ ZERANDO ITEM (DELETANDO):
+                  ItemTamanhoId: ${itemTamanhoId}
+                  Quantidade em OutInput: ${outInputItem.quantidade}
+                  EstoqueId: ${outInputItem.estoqueId}
+                  Vai devolver: +${outInputItem.quantidade} para estoque
+                `);
+
                 // Zerar item - excluir OutInput e devolver para estoque
                 await prisma.outInput.delete({ where: { id: outInputItem.id } });
 
@@ -502,6 +521,15 @@ export class CaixaPrisma {
 
                 // Ajustar estoque e GradeItem se houver diferença
                 if (diff !== 0) {
+                  // 🔍 DEBUG LOG ESTOQUE
+                  console.log(`
+                    📦 AJUSTANDO ESTOQUE (ITEM NORMAL):
+                    ItemTamanhoId: ${itemTamanhoId}
+                    EstoqueId: ${outInputItem.estoqueId}
+                    Increment: ${diff}
+                    (Se positivo: devolve | Se negativo: retira)
+                  `);
+
                   // Ajustar estoque (se diff > 0, devolve para estoque)
                   await prisma.estoque.update({
                     where: { id: outInputItem.estoqueId },
@@ -571,7 +599,7 @@ export class CaixaPrisma {
 
             // Reordenar caixas posteriores (decrementar números)
             for (const caixa of caixasPosteriores) {
-              const numeroAtual = parseInt(caixa.caixaNumber, 10);              
+              const numeroAtual = parseInt(caixa.caixaNumber, 10);
               const novoNumero = (numeroAtual - 1).toString();
               await prisma.caixa.update({
                 where: { id: caixa.id },
