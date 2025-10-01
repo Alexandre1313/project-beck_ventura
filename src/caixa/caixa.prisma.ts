@@ -561,17 +561,6 @@ export class CaixaPrisma {
               orderBy: { caixaNumber: 'asc' }
             });
 
-            // Reordenar caixas posteriores (decrementar números)
-            for (const caixa of caixasPosteriores) {
-              const numeroAtual = parseInt(caixa.caixaNumber, 10);
-              const novoNumero = (numeroAtual - 1).toString().padStart(2, '0');
-
-              await prisma.caixa.update({
-                where: { id: caixa.id },
-                data: { caixaNumber: novoNumero }
-              });
-            }
-
             // Excluir todos os OutInput da caixa
             await prisma.outInput.deleteMany({
               where: { caixaId: id }
@@ -579,6 +568,16 @@ export class CaixaPrisma {
 
             // Excluir a caixa
             await prisma.caixa.delete({ where: { id } });
+
+            // Reordenar caixas posteriores (decrementar números)
+            for (const caixa of caixasPosteriores) {
+              const numeroAtual = parseInt(caixa.caixaNumber, 10);              
+              const novoNumero = (numeroAtual - 1).toString();
+              await prisma.caixa.update({
+                where: { id: caixa.id },
+                data: { caixaNumber: novoNumero }
+              });
+            }
 
             // Retornar objeto indicando que a caixa foi excluída
             return {
