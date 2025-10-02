@@ -334,7 +334,7 @@ export class CaixaPrisma {
             const quantidadeAtual = caixaItemAtual.itemQty;
             const diff = quantidadeAtual - itemQty;
 
-            // 🔍 DEBUG LOG
+            /* 🔍 DEBUG LOG
             console.log(`
               🔍 AJUSTE DE ITEM:
               ItemTamanhoId: ${itemTamanhoId}
@@ -342,7 +342,7 @@ export class CaixaPrisma {
               Nova Quantidade (itemQty): ${itemQty}
               Diferença (diff): ${diff}
               É Kit?: ${itemTamanho.isKit}
-            `);
+            `);*/
 
             if (itemTamanho.isKit) {
               // PROCESSAR KIT
@@ -469,14 +469,14 @@ export class CaixaPrisma {
               }
 
               if (itemQty === 0) {
-                // 🔍 DEBUG LOG ZERAR
+                /* 🔍 DEBUG LOG ZERAR
                 console.log(`
                   🗑️ ZERANDO ITEM (DELETANDO):
                   ItemTamanhoId: ${itemTamanhoId}
                   Quantidade em OutInput: ${outInputItem.quantidade}
                   EstoqueId: ${outInputItem.estoqueId}
                   Vai devolver: +${outInputItem.quantidade} para estoque
-                `);
+                `);*/
 
                 // Zerar item - excluir OutInput e devolver para estoque
                 await prisma.outInput.delete({ where: { id: outInputItem.id } });
@@ -521,14 +521,14 @@ export class CaixaPrisma {
 
                 // Ajustar estoque e GradeItem se houver diferença
                 if (diff !== 0) {
-                  // 🔍 DEBUG LOG ESTOQUE
+                  /* 🔍 DEBUG LOG ESTOQUE
                   console.log(`
                     📦 AJUSTANDO ESTOQUE (ITEM NORMAL):
                     ItemTamanhoId: ${itemTamanhoId}
                     EstoqueId: ${outInputItem.estoqueId}
                     Increment: ${diff}
                     (Se positivo: devolve | Se negativo: retira)
-                  `);
+                  `);*/
 
                   // Ajustar estoque (se diff > 0, devolve para estoque)
                   await prisma.estoque.update({
