@@ -578,16 +578,16 @@ export class CaixaPrisma {
             // Excluir caixa e reordenar números das caixas posteriores
             const numeroExcluido = parseInt(caixaAtual.caixaNumber, 10);
 
-            // Buscar caixas posteriores para reordenar
-            const caixasPosteriores = await prisma.caixa.findMany({
+            // Buscar caixas para reordenar
+            const todasCaixas = await prisma.caixa.findMany({
               where: {
-                gradeId: caixaAtual.gradeId,
-                caixaNumber: {
-                  gt: caixaAtual.caixaNumber
-                }
-              },
-              orderBy: { caixaNumber: 'asc' }
+                gradeId: caixaAtual.gradeId
+              }
             });
+
+            const caixasPosteriores = todasCaixas
+              .filter(caixa => parseInt(caixa.caixaNumber) > numeroExcluido)
+              .sort((a, b) => parseInt(a.caixaNumber) - parseInt(b.caixaNumber));            
 
             // Excluir todos os OutInput da caixa
             await prisma.outInput.deleteMany({
@@ -598,13 +598,15 @@ export class CaixaPrisma {
             await prisma.caixa.delete({ where: { id } });
 
             // Reordenar caixas posteriores (decrementar números)
-            for (const caixa of caixasPosteriores) {
-              const numeroAtual = parseInt(caixa.caixaNumber, 10);
-              const novoNumero = (numeroAtual - 1).toString();
-              await prisma.caixa.update({
-                where: { id: caixa.id },
-                data: { caixaNumber: novoNumero }
-              });
+            if (caixasPosteriores.length > 0) {
+              for (const caixa of caixasPosteriores) {
+                const numeroAtual = parseInt(caixa.caixaNumber, 10);
+                const novoNumero = (numeroAtual - 1).toString();
+                await prisma.caixa.update({
+                  where: { id: caixa.id },
+                  data: { caixaNumber: novoNumero }
+                });
+              }
             }
 
             // Retornar objeto indicando que a caixa foi excluída
