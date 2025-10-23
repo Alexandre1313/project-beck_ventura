@@ -146,9 +146,10 @@ export async function gerarPDFExpedicao(resumo: ExpedicaoResumoPDGrouped[]): Pro
       dataGroup.items.forEach(item => {
         const isSubtotal = item.item === 'Total';
         const isTotalGeral = item.item === 'Total Geral';
+        const isTotalStatus = item.item?.startsWith('📊 Total '); // ✅ NOVO: Total por status
         let diff = item.expedido - item.previsto;
 
-        if (isSubtotal || isTotalGeral) {
+        if (isSubtotal || isTotalGeral || isTotalStatus) {
           // Linha total/subtotal com destaque
           body.push([
             { text: '', margin: [0, 1, 0, 1] },
@@ -442,6 +443,7 @@ export async function gerarPDFExpedicaoComEscola(resumo: ExpedicaoResumoPDGroupe
         const isTotalData = item.item === 'Total da Data';
         const isEscolaHeader = item.item?.startsWith('ESCOLA:');
         const isTotalEscola = item.item?.startsWith('Total ') && !isTotalGeral && !isTotalData;
+        const isTotalStatus = item.item?.startsWith('📊 Total '); // ✅ NOVO: Total por status
 
         let diff = item.expedido - item.previsto;
 
@@ -465,7 +467,7 @@ export async function gerarPDFExpedicaoComEscola(resumo: ExpedicaoResumoPDGroupe
             null,
             null
           ]);
-        } else if (isSubtotal || isTotalGeral || isTotalData || isTotalEscola) {
+        } else if (isSubtotal || isTotalGeral || isTotalData || isTotalEscola || isTotalStatus) {
           // 📊 Linha total/subtotal com design moderno
           let bgColor = COLORS.NEUTRAL;
           let textPrefix = '📄 ';

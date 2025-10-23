@@ -338,7 +338,7 @@ export class GradePrisma {
         });
       }
 
-      const statusOrder = ['EXPEDIDA', 'DESPACHADA', 'PENDENTE'];
+      const statusOrder = ['DESPACHADA', 'EXPEDIDA', 'IMPRESSA', 'PENDENTE', 'PRONTA'];
       const resultado: ExpedicaoResumoPDGrouped[] = [];
 
       for (const [projectname, statuses] of Object.entries(grouped)) {
@@ -357,6 +357,8 @@ export class GradePrisma {
 
         for (const status of sortedStatuses) {
           const statusUpper = status.toUpperCase();
+          let totalStatusPrevisto = 0;
+          let totalStatusExpedido = 0;
 
           groupedItems.push({
             data: null,
@@ -393,6 +395,12 @@ export class GradePrisma {
 
             const subtotalPrevisto = items.reduce((sum, x) => sum + x.previsto, 0);
             const subtotalExpedido = items.reduce((sum, x) => sum + x.expedido, 0);
+            
+            // Acumula no total do status
+            totalStatusPrevisto += subtotalPrevisto;
+            totalStatusExpedido += subtotalExpedido;
+            
+            // Acumula no total geral
             totalGeralPrevisto += subtotalPrevisto;
             totalGeralExpedido += subtotalExpedido;
 
@@ -411,6 +419,19 @@ export class GradePrisma {
               ],
             });
           }
+          
+          // ✅ NOVO: Total acumulado por status
+          groupedItems.push({
+            data: null,
+            items: [{
+              data: null,
+              item: `📊 Total ${statusUpper}`,
+              genero: '',
+              tamanho: '',
+              previsto: totalStatusPrevisto,
+              expedido: totalStatusExpedido,
+            }],
+          });
         }
 
         groupedItems.push({
@@ -554,7 +575,7 @@ export class GradePrisma {
         }
       }
 
-      const statusOrder = ['EXPEDIDA', 'DESPACHADA', 'PENDENTE'];
+      const statusOrder = ['DESPACHADA', 'EXPEDIDA', 'IMPRESSA', 'PENDENTE', 'PRONTA'];
       const resultado: ExpedicaoResumoPDGrouped[] = [];
 
       for (const [projectname, statuses] of Object.entries(grouped)) {
@@ -573,6 +594,8 @@ export class GradePrisma {
 
         for (const status of sortedStatuses) {
           const statusUpper = status.toUpperCase();
+          let totalStatusPrevisto = 0;
+          let totalStatusExpedido = 0;
 
           groupedItems.push({
             data: null,
@@ -591,8 +614,8 @@ export class GradePrisma {
             if (a === 'null') return 1;
             if (b === 'null') return -1;
             return new Date(b).getTime() - new Date(a).getTime(); // mais recente → mais antiga
-          });
-
+          });         
+          
           for (const data of sortedDates) {
             const itemsMap = dateGroups[data];
             const items = Object.values(itemsMap);
@@ -613,6 +636,12 @@ export class GradePrisma {
 
             const subtotalPrevisto = items.reduce((sum, x) => sum + x.previsto, 0);
             const subtotalExpedido = items.reduce((sum, x) => sum + x.expedido, 0);
+            
+            // Acumula no total do status
+            totalStatusPrevisto += subtotalPrevisto;
+            totalStatusExpedido += subtotalExpedido;
+            
+            // Acumula no total geral
             totalGeralPrevisto += subtotalPrevisto;
             totalGeralExpedido += subtotalExpedido;
 
@@ -631,6 +660,19 @@ export class GradePrisma {
               ],
             });
           }
+          
+          // ✅ NOVO: Total acumulado por status
+          groupedItems.push({
+            data: null,
+            items: [{
+              data: null,
+              item: `📊 Total ${statusUpper}`,
+              genero: '',
+              tamanho: '',
+              previsto: totalStatusPrevisto,
+              expedido: totalStatusExpedido,
+            }],
+          });
         }
 
         groupedItems.push({
@@ -773,7 +815,7 @@ export class GradePrisma {
         }
       }
 
-      const statusOrder = ['EXPEDIDA', 'DESPACHADA', 'PENDENTE'];
+      const statusOrder = ['DESPACHADA', 'EXPEDIDA', 'IMPRESSA', 'PENDENTE', 'PRONTA'];
       const resultado: ExpedicaoResumoPDGrouped[] = [];
 
       for (const [projectname, statuses] of Object.entries(grouped)) {
@@ -792,6 +834,8 @@ export class GradePrisma {
 
         for (const status of sortedStatuses) {
           const statusUpper = status.toUpperCase();
+          let totalStatusPrevisto = 0;
+          let totalStatusExpedido = 0;
 
           groupedItems.push({
             data: null,
@@ -810,8 +854,8 @@ export class GradePrisma {
             if (a === 'null') return 1;
             if (b === 'null') return -1;
             return new Date(b).getTime() - new Date(a).getTime(); // mais recente → mais antiga
-          });
-
+          });          
+          
           for (const data of sortedDates) {
             const itemsMap = dateGroups[data];
             const items = Object.values(itemsMap);
@@ -832,6 +876,12 @@ export class GradePrisma {
 
             const subtotalPrevisto = items.reduce((sum, x) => sum + x.previsto, 0);
             const subtotalExpedido = items.reduce((sum, x) => sum + x.expedido, 0);
+            
+            // Acumula no total do status
+            totalStatusPrevisto += subtotalPrevisto;
+            totalStatusExpedido += subtotalExpedido;
+            
+            // Acumula no total geral
             totalGeralPrevisto += subtotalPrevisto;
             totalGeralExpedido += subtotalExpedido;
 
@@ -850,6 +900,19 @@ export class GradePrisma {
               ],
             });
           }
+          
+          // ✅ NOVO: Total acumulado por status
+          groupedItems.push({
+            data: null,
+            items: [{
+              data: null,
+              item: `📊 Total ${statusUpper}`,
+              genero: '',
+              tamanho: '',
+              previsto: totalStatusPrevisto,
+              expedido: totalStatusExpedido,
+            }],
+          });
         }
 
         groupedItems.push({
@@ -996,7 +1059,7 @@ export class GradePrisma {
         });
       }
 
-      const statusOrder = ['EXPEDIDA', 'DESPACHADA', 'PENDENTE'];
+      const statusOrder = ['DESPACHADA', 'EXPEDIDA', 'IMPRESSA', 'PENDENTE', 'PRONTA'];
       const resultado: ExpedicaoResumoPDGrouped[] = [];
 
       for (const [projectname, statuses] of Object.entries(grouped)) {
@@ -1015,6 +1078,8 @@ export class GradePrisma {
 
         for (const status of sortedStatuses) {
           const statusUpper = status.toUpperCase();
+          let totalStatusPrevisto = 0;
+          let totalStatusExpedido = 0;
 
           groupedItems.push({
             data: null,
@@ -1033,8 +1098,8 @@ export class GradePrisma {
             if (a === 'null') return 1;
             if (b === 'null') return -1;
             return new Date(b).getTime() - new Date(a).getTime(); // mais recente → mais antiga
-          });
-
+          });         
+          
           for (const data of sortedDates) {
             const escolaGroups = dateGroups[data];
             // Ordena escolas pelo número da escola (extraindo o número do formato "Nome - Escola #123")
@@ -1074,6 +1139,8 @@ export class GradePrisma {
 
               const subtotalPrevisto = items.reduce((sum, x) => sum + x.previsto, 0);
               const subtotalExpedido = items.reduce((sum, x) => sum + x.expedido, 0);
+              totalStatusPrevisto += subtotalPrevisto;
+              totalStatusExpedido += subtotalExpedido;
               totalGeralPrevisto += subtotalPrevisto;
               totalGeralExpedido += subtotalExpedido;
 
@@ -1127,6 +1194,19 @@ export class GradePrisma {
               }],
             });
           }
+          
+          // ✅ NOVO: Total acumulado por status
+          groupedItems.push({
+            data: null,
+            items: [{
+              data: null,
+              item: `📊 Total ${statusUpper}`,
+              genero: '',
+              tamanho: '',
+              previsto: totalStatusPrevisto,
+              expedido: totalStatusExpedido,
+            }],
+          });
         }
 
         groupedItems.push({
@@ -1279,7 +1359,7 @@ export class GradePrisma {
         }
       }
 
-      const statusOrder = ['EXPEDIDA', 'DESPACHADA', 'PENDENTE'];
+      const statusOrder = ['DESPACHADA', 'EXPEDIDA', 'IMPRESSA', 'PENDENTE', 'PRONTA'];
       const resultado: ExpedicaoResumoPDGrouped[] = [];
 
       for (const [projectname, statuses] of Object.entries(grouped)) {
@@ -1298,6 +1378,8 @@ export class GradePrisma {
 
         for (const status of sortedStatuses) {
           const statusUpper = status.toUpperCase();
+          let totalStatusPrevisto = 0;
+          let totalStatusExpedido = 0;
 
           groupedItems.push({
             data: null,
@@ -1358,6 +1440,8 @@ export class GradePrisma {
 
               const subtotalPrevisto = items.reduce((sum, x) => sum + x.previsto, 0);
               const subtotalExpedido = items.reduce((sum, x) => sum + x.expedido, 0);
+              totalStatusPrevisto += subtotalPrevisto;
+              totalStatusExpedido += subtotalExpedido;
               totalGeralPrevisto += subtotalPrevisto;
               totalGeralExpedido += subtotalExpedido;
 
@@ -1411,6 +1495,19 @@ export class GradePrisma {
               }],
             });
           }
+          
+          // ✅ NOVO: Total acumulado por status
+          groupedItems.push({
+            data: null,
+            items: [{
+              data: null,
+              item: `📊 Total ${statusUpper}`,
+              genero: '',
+              tamanho: '',
+              previsto: totalStatusPrevisto,
+              expedido: totalStatusExpedido,
+            }],
+          });
         }
 
         groupedItems.push({
