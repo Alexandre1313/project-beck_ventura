@@ -71,61 +71,7 @@ export class ProjetoPrisma {
   async obterPorId(id: number): Promise<Projeto | null> {
     const projeto = await this.prisma.projeto.findUnique({ where: { id } });
     return (projeto as Projeto) ?? null;
-  }
-
-  /*
-  async obterPorIdEscolas(id: number): Promise<(Omit<Projeto, 'escolas'> & { escolas: (Omit<Escola, 'grades'> & { grades: (Grade & { iniciada: boolean })[]; })[]; }) | null> {
-    const projeto = await this.prisma.projeto.findUnique({
-      where: { id },
-      include: {
-        escolas: {
-          include: {
-            grades: {
-              orderBy: { createdAt: 'desc' },
-              take: 7,
-              include: {
-                // Inclui apenas para uso interno
-                itensGrade: {
-                  select: { quantidadeExpedida: true },
-                },
-              },
-            },
-          },
-        },
-      },
-    });
-
-    if (!projeto) return null;
-
-    const limite = subMinutes(new Date(), 30);
-
-    const resultado = {
-      ...projeto,
-      escolas: projeto.escolas.map((escola) => ({
-        ...escola,
-        grades: escola.grades
-          .filter((grade) => {
-            if (grade.status === 'DESPACHADA') {
-              return isAfter(grade.updatedAt, limite);
-            }
-            return true;
-          })
-          .map((grade) => {
-            const iniciada = grade.itensGrade.some(
-              (item) => item.quantidadeExpedida > 0
-            );
-            // Retorna grade com iniciada, mas sem os gradeItens
-            const { itensGrade, ...resto } = grade;
-            return {
-              ...resto,
-              iniciada,
-            };
-          }),
-      })),
-    };
-
-    return resultado;
-  }*/
+  } 
 
   async obterPorIdEscolas(id: number): Promise<(Omit<Projeto, 'escolas'> & { escolas: (Omit<Escola, 'grades'> & { grades: (Grade & { iniciada: boolean })[]; percentualProgresso: number; })[]; }) | null> {
     const projeto = await this.prisma.projeto.findUnique({
@@ -172,8 +118,7 @@ export class ProjetoPrisma {
           });
         });
 
-        const percentualProgresso =
-          totalPrevisto > 0 ? Math.round((totalExpedido / totalPrevisto) * 100) : 0;
+        const percentualProgresso = totalPrevisto > 0 ? Math.floor((totalExpedido / totalPrevisto) * 100) : 0;
 
         return {
           ...escola,
