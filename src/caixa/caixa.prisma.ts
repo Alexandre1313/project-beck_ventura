@@ -257,6 +257,7 @@ export class CaixaPrisma {
         projeto: caixa.grade.escola.projeto.nome,
         escola: caixa.grade.escola.nome,
         escolaNumero: caixa.grade.escola.numeroEscola,
+        escolaId: caixa.grade.escola.id,
         itens: caixa.caixaItem.map((item) => ({
           id: item.id,
           caixaId: item.caixaId,

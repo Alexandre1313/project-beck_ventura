@@ -11,5 +11,6 @@ export default interface CaixaAjuste {
     projeto: string,
     escola: string,
     escolaNumero: string,
+    escolaId: number,
     itens: ItensCaixaAjuste[],
 }
