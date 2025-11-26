@@ -9,6 +9,7 @@ export default interface CaixaAjuste {
     createdAt: string,
     updatedAt: string,
     projeto: string,
+    projetoId: number;
     escola: string,
     escolaNumero: string,
     escolaId: number,

@@ -255,6 +255,7 @@ export class CaixaPrisma {
         createdAt: convertSPTime(String(caixa.createdAt)),
         updatedAt: convertSPTime(String(caixa.updatedAt)),
         projeto: caixa.grade.escola.projeto.nome,
+        projetoId: caixa.grade.escola.projeto.id,
         escola: caixa.grade.escola.nome,
         escolaNumero: caixa.grade.escola.numeroEscola,
         escolaId: caixa.grade.escola.id,
