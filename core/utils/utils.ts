@@ -1,5 +1,6 @@
 import { format } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
+import * as os from "os";
 
 export default function convertSPTime(dateString: string): string {
   const timeZone = 'America/Sao_Paulo';
@@ -59,4 +60,17 @@ export const tratarValor = (valor: any, valorPadrao: string | null = null): stri
     return valorPadrao;
   }
   return limparString(String(valor));
+}
+
+export function getLocalIPv4(): string | null {
+  const interfaces = os.networkInterfaces();
+
+  for (const iface of Object.values(interfaces)) {
+    for (const config of iface || []) {
+      if (config.family === 'IPv4' && !config.internal) {
+        return config.address; // <- IP atual da máquina
+      }
+    }
+  }
+  return null;
 }
