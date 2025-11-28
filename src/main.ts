@@ -7,8 +7,7 @@ async function bootstrap() {
     cors: true,
     logger: ['error', 'warn'],
   });
-
-  const isProd = process.env.NODE_ENV === 'production';
+  const isProd = process.env.NODE_ENV === 'production'; 
   const port = isProd ? 4997 : 4997; 
   const host = getLocalIPv4();
 
