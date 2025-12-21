@@ -75,7 +75,7 @@ const askQuestionCompanyId = (question: string): Promise<string> => {
     });
 };
 
-const messageConfirmation = (message: string, idProject: string, idCompany: string, remNumber: string, tipo: string | null, companys: Company[], fileNames: Projeto[]) => {
+const messageConfirmation = (message: string, idProject: string, idCompany: string, remNumber: string, tipo: string | null, companys: Company[], fileNames: any[]) => {
     console.log(``);
     console.log(message);
     console.log(``);
@@ -84,7 +84,7 @@ const messageConfirmation = (message: string, idProject: string, idCompany: stri
     const c = companys.find((c) => c.id === parseInt(idCompany, 10));
     console.log(`EMPRESA: ${String(c.id).padStart(2, '0')} - ${c.nome}`);
     console.log(`REMESSA: ${remNumber}`);
-    console.log(`   TIPO: ${tipo ? tipo: 'PEDIDO NORMAL'}`);
+    console.log(`   TIPO: ${tipo ? tipo : 'PEDIDO NORMAL'}`);
     console.log(``);
 }
 
@@ -228,42 +228,55 @@ async function seed2() {
 
         let nameFile = '';
 
-        const nameFiles = await prisma.projeto.findMany();
+        const nameFiles = await prisma.$queryRaw<
+            {
+                id: number;
+                nome: string;
+                ultimaRemessa: number;
+                proximaRemessa: number;
+            }[]
+        >`
+            SELECT
+            p.id,
+            p.nome,
+            COALESCE(MAX(g.remessa), 0)                       AS "ultimaRemessa",
+            COALESCE(MAX(g.remessa), 0) + 1                   AS "proximaRemessa"
+            FROM "Projeto" p
+            LEFT JOIN "Escola" e ON e."projetoId" = p.id
+            LEFT JOIN "Grade" g ON g."escolaId" = e.id
+            GROUP BY p.id
+            ORDER BY p.nome;
+            `;
 
         console.log('');
         nameFiles.forEach((proj) => {
-            console.log(`Digite ${String(proj.id).padStart(2, ' ')} para: ${proj.nome}`.toUpperCase())            
+            console.log(`Digite ${String(proj.id).padStart(2, ' ')} para: ${proj.nome}`.toUpperCase())
         });
         console.log('');
 
-        while (nameFile === '' || isNaN(Number(nameFile)) || !Number.isInteger(Number(nameFile))) {
-            nameFile = await askQuestionNameFile('Informe o ID do projeto para o qual deseja inserir pedidos (INFORME CANCEL PARA SAIR): '.toUpperCase());
-            if (nameFile.toUpperCase() === 'CANCEL') {
-                console.clear();
-                console.log('Inserção abortada pelo usuário.'.toUpperCase());
-                return; // Sai da função se o usuário não quiser continuar
-            }
-        }
-
-        let remessa: string = '';
-
         while (true) {
-            remessa = await askQuestionRemessa('Informe a remessa do pedido, valores maior que 0 (INFORME CANCEL PARA SAIR): '.toUpperCase());
+            nameFile = await askQuestionNameFile(
+                'Informe o ID do projeto para o qual deseja inserir pedidos (INFORME CANCEL PARA SAIR): '.toUpperCase()
+            );
 
-            if (remessa.toUpperCase() === 'CANCEL') {
+            if (nameFile.toUpperCase() === 'CANCEL') {
                 console.clear();
                 console.log('Inserção abortada pelo usuário.'.toUpperCase());
                 return;
             }
 
-            const numero = parseInt(remessa, 10);
+            const id = Number(nameFile);
 
-            if (!isNaN(numero) && numero > 0) {
-                // número válido, sai do loop
-                break;
+            if (!Number.isInteger(id)) {
+                console.log('ID inválido. Informe um número inteiro válido.'.toUpperCase());
+                continue;
             }
 
-            console.log('Valor inválido. Digite um número maior que 0.'.toUpperCase());
+            if (!nameFiles.some(proj => proj.id === id)) {
+                console.log('Projeto não encontrado. Informe um ID listado acima.'.toUpperCase());
+                continue;
+            }
+            break;
         }
 
         let tipo: string | null = null;
@@ -292,33 +305,97 @@ async function seed2() {
             console.log('Entrada inválida. Digite apenas R, N ou CANCEL.'.toUpperCase());
         }
 
-        let company: string = '';
+        const ps = nameFiles.find(p => p.id === Number(nameFile));
 
-        const companys = await prisma.company.findMany();
+        if (!ps) {
+            console.log('Projeto não encontrado.'.toUpperCase());
+            return;
+        }
 
-        console.log('');
-        companys.forEach((comp) => {
-            console.log(`Digite ${String(comp.id).padStart(2, ' ')} para: ${comp.nome}`.toUpperCase())
-            console.log('')
-        });
-        console.log('');
+        let remessa = '';
 
         while (true) {
-            company = await askQuestionCompanyId('Informe o identificador da empresa, maior que 0 (INFORME CANCEL PARA SAIR): '.toUpperCase());
+            console.log('');
 
-            if (company.toUpperCase() === 'CANCEL') {
+            const isReposicao = Boolean(tipo);
+            const valorEsperado = isReposicao ? ps.ultimaRemessa : ps.proximaRemessa;
+
+            console.log(
+                `${isReposicao ? 'Última' : 'Próxima'} remessa: ${String(valorEsperado).padStart(2, ' ')}`.toUpperCase()
+            );
+
+            remessa = await askQuestionRemessa(
+                (
+                    isReposicao
+                        ? 'Informe a remessa desta reposição, valor deve ser maior que 0 e menor ou igual à (última remessa) mostrada acima'
+                        : 'Informe a remessa do pedido, valor deve ser igual à (próxima remessa) mostrada acima'
+                ).toUpperCase() + ' (INFORME CANCEL PARA SAIR): '
+            );
+
+            if (remessa.trim().toUpperCase() === 'CANCEL') {
                 console.clear();
                 console.log('Inserção abortada pelo usuário.'.toUpperCase());
                 return;
             }
 
-            const companyNumber = parseInt(company, 10);
+            const numero = Number(remessa);
 
-            if (!isNaN(companyNumber) && companyNumber > 0) {
-                break; // válido, sai do loop
+            const valido = isReposicao
+                ? Number.isInteger(numero) && numero > 0 && numero <= ps.ultimaRemessa
+                : Number.isInteger(numero) && numero === ps.proximaRemessa;
+
+            if (valido) {
+                break;
             }
 
-            console.log('Valor inválido. Informe um número inteiro maior que 0.'.toUpperCase());
+            console.log(
+                (
+                    isReposicao
+                        ? 'Valor inválido. Digite um número maior que 0 e menor ou igual à última remessa.'
+                        : 'Valor inválido. Digite exatamente o número da próxima remessa.'
+                ).toUpperCase()
+            );
+        }
+
+        let company = '';
+
+        const companys = await prisma.company.findMany();
+
+        console.log('');
+        companys.forEach(comp => {
+            console.log(
+                `Digite ${String(comp.id).padStart(2, ' ')} para: ${comp.nome}`.toUpperCase()
+            );
+        });
+        console.log('');
+
+        while (true) {
+            company = await askQuestionCompanyId(
+                'Informe o identificador da empresa, maior que 0 (INFORME CANCEL PARA SAIR): '.toUpperCase()
+            );
+
+            const valor = company.trim().toUpperCase();
+
+            if (valor === 'CANCEL') {
+                console.clear();
+                console.log('Inserção abortada pelo usuário.'.toUpperCase());
+                return;
+            }
+
+            const companyId = Number(valor);
+
+            if (!Number.isInteger(companyId) || companyId <= 0) {
+                console.log('Valor inválido. Informe um número inteiro maior que 0.'.toUpperCase());
+                continue;
+            }
+
+            const existe = companys.some(comp => comp.id === companyId);
+
+            if (!existe) {
+                console.log('Empresa não encontrada. Informe um ID listado acima.'.toUpperCase());
+                continue;
+            }           
+            break;
         }
 
         let filename = '';
