@@ -697,5 +697,4 @@ export class CaixaPrisma {
   `;
     return caixaFindItem;
   }
-
 }
