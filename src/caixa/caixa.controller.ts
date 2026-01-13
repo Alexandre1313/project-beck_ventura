@@ -24,6 +24,12 @@ export class CaixaController {
     return caixas;
   }
 
+  @Get('getcaixasfinditem/:gradeId/:itemTamanhoId')
+  async getCaixasFindItem(@Param('gradeId') gradeId: string, @Param('itemTamanhoId') itemTamanhoId: string): Promise<any[]> {
+    const caixasComItem = await this.repo.findCaixasByGradeAndItemTamanho(+gradeId, +itemTamanhoId);
+    return caixasComItem;
+  }  
+
   // Salvar ou criar uma caixa
   @Post('/inserir')
   @HttpCode(HttpStatus.CREATED)

@@ -42,7 +42,7 @@ import { ItemsInserction2, ComponenteDoKit } from "./ItemsInserction2";
 import ExpedicaoResumoPDItem from "./ExpedicaoResumoPDItem";
 import DataAgrupada from "./DataAgrupada";
 import ExpedicaoResumoPDGrouped from "./ExpedicaoResumoPDGrouped";
-
+import CaixaFindItem from "./CaixaFindItem";
 
 export type {
     AddressCompany, AddressSchool, Barcode, Caixa,
@@ -51,5 +51,5 @@ export type {
     ItemTamanho, ItensProjects, Login, OutInput, ProjectItems, Projeto, ProjetosSimp, ProjetoStockItems, QtyEmbDay,
     StockGenerate, Tamanho, TamanhoQuantidade, TelephonesCompany, TelephonesSchool, Usuarios, Grafo, TipoEmbalagem,
     CaixaAjuste, ItensCaixaAjuste, ItemsInserction2, ComponenteDoKit, ExpedicaoResumoPDGrouped, ExpedicaoResumoPDItem,
-    DataAgrupada,
+    DataAgrupada, CaixaFindItem
 };

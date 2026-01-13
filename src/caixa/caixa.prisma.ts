@@ -1,4 +1,4 @@
-import { Caixa, CaixaAjuste, convertSPTime } from '@core/index';
+import { Caixa, CaixaAjuste, CaixaFindItem, convertSPTime } from '@core/index';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 
@@ -589,7 +589,7 @@ export class CaixaPrisma {
 
             const caixasPosteriores = todasCaixas
               .filter(caixa => parseInt(caixa.caixaNumber) > numeroExcluido)
-              .sort((a, b) => parseInt(a.caixaNumber) - parseInt(b.caixaNumber));            
+              .sort((a, b) => parseInt(a.caixaNumber) - parseInt(b.caixaNumber));
 
             // Excluir todos os OutInput da caixa
             await prisma.outInput.deleteMany({
@@ -658,6 +658,44 @@ export class CaixaPrisma {
     }
 
     return null;
+  }
+
+  async findCaixasByGradeAndItemTamanho(gradeId: number, itemTamanhoId: number): Promise<CaixaFindItem[]> {
+    const caixaFindItem = await this.prisma.$queryRaw<CaixaFindItem[]>`
+    SELECT
+      c.id,
+      c."gradeId",
+      c."escolaCaixa",
+      c."escolaNumber",
+      c."projeto",
+      c."qtyCaixa",
+      c."caixaNumber",
+      c."createdAt",
+      c."updatedAt",
+      c."userId",
+      c."numberJoin",
+      c."tipoEmbalagemId",
+      json_agg(
+        json_build_object(
+          'id', ci.id,
+          'caixaId', ci."caixaId",
+          'itemName', ci."itemName",
+          'itemGenero', ci."itemGenero",
+          'itemTam', ci."itemTam",
+          'itemQty', ci."itemQty",
+          'itemTamanhoId', ci."itemTamanhoId",
+          'createdAt', ci."createdAt",
+          'updatedAt', ci."updatedAt"
+        )
+      ) AS "caixaItem"
+    FROM "Caixa" c
+    JOIN "CaixaItem" ci ON ci."caixaId" = c.id
+    WHERE c."gradeId" = ${gradeId}
+      AND ci."itemTamanhoId" = ${itemTamanhoId}
+    GROUP BY c.id
+    ORDER BY CAST(c."caixaNumber" AS INTEGER) DESC
+  `;
+    return caixaFindItem;
   }
 
 }
