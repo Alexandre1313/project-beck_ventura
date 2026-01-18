@@ -15,4 +15,5 @@ async function bootstrap() {
     console.log('\x1b[32m%s\x1b[0m', `✅ Server running on IP ${host} and listening on port ${port} (${isProd ? 'PROD' : 'DEV'})`);
   });
 }
+
 bootstrap();
