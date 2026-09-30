@@ -9,11 +9,20 @@ export class ProjetoController {
   // Salvar ou criar um projeto
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async salvarProjeto(@Body() projeto: Omit<Projeto, 'createdAt' | 'updatedAt'>): Promise<Projeto> {
+  async salvarProjeto(
+    @Body() projeto: Omit<Projeto, 'createdAt' | 'updatedAt'>,
+  ): Promise<Projeto> {
     try {
       return await this.repo.salvar(projeto);
-    } catch (error) {
-      throw new BadRequestException('Erro ao salvar o projeto: ' + error.message);
+    } catch (error: unknown) {
+      const mensagem =
+        error instanceof Error
+          ? error.message
+          : 'Erro desconhecido ao salvar o projeto.';
+
+      throw new BadRequestException(
+        `Erro ao salvar o projeto: ${mensagem}`,
+      );
     }
   }
 
@@ -145,18 +154,30 @@ export class ProjetoController {
     return projeto;
   }
 
-  // Excluir um projeto específico pelo ID
   @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT) // Indica que não há conteúdo após a exclusão
+  @HttpCode(HttpStatus.NO_CONTENT)
   async excluirProjeto(@Param('id') id: string): Promise<void> {
-    const projeto = await this.repo.obterPorId(+id);
+    const projetoId = Number(id);
+
+    const projeto = await this.repo.obterPorId(projetoId);
+
     if (!projeto) {
-      throw new NotFoundException(`Projeto com ID ${id} não encontrado.`);
+      throw new NotFoundException(
+        `Projeto com ID ${projetoId} não encontrado.`,
+      );
     }
+
     try {
-      await this.repo.excluir(+id);
-    } catch (error) {
-      throw new BadRequestException('Erro ao excluir o projeto: ' + error.message);
+      await this.repo.excluir(projetoId);
+    } catch (error: unknown) {
+      const mensagem =
+        error instanceof Error
+          ? error.message
+          : 'Erro desconhecido ao excluir o projeto.';
+
+      throw new BadRequestException(
+        `Erro ao excluir o projeto: ${mensagem}`,
+      );
     }
   }
 

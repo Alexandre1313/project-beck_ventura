@@ -71,7 +71,7 @@ export class ProjetoPrisma {
   async obterPorId(id: number): Promise<Projeto | null> {
     const projeto = await this.prisma.projeto.findUnique({ where: { id } });
     return (projeto as Projeto) ?? null;
-  } 
+  }
 
   async obterPorIdEscolas(id: number): Promise<(Omit<Projeto, 'escolas'> & { escolas: (Omit<Escola, 'grades'> & { grades: (Grade & { iniciada: boolean })[]; percentualProgresso: number; })[]; }) | null> {
     const projeto = await this.prisma.projeto.findUnique({
@@ -181,17 +181,24 @@ export class ProjetoPrisma {
     try {
       // Tente excluir o item com o ID fornecido
       await this.prisma.projeto.delete({ where: { id } });
-    } catch (error) {
+    } catch (error: unknown) {
       // Aqui você pode capturar e tratar o erro
       console.error('Erro ao excluir o projeto:', error);
 
       // Lançar um erro apropriado ou lançar uma exceção
-      if (error.code === 'P2025') {
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'code' in error &&
+        error.code === 'P2025'
+      ) {
         // Erro específico quando o registro não é encontrado
         throw new Error('O projeto não foi encontrado.');
       } else {
         // Lidar com outros erros genéricos
-        throw new Error('Erro ao tentar excluir o projeto. Por favor, tente novamente.');
+        throw new Error(
+          'Erro ao tentar excluir o projeto. Por favor, tente novamente.',
+        );
       }
     }
   }
