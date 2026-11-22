@@ -336,7 +336,7 @@ export class CaixaPrisma {
             const quantidadeAtual = caixaItemAtual.itemQty;
             const diff = quantidadeAtual - itemQty;
 
-            /* 🔍 DEBUG LOG
+            /*🔍 DEBUG LOG
             console.log(`
               🔍 AJUSTE DE ITEM:
               ItemTamanhoId: ${itemTamanhoId}
